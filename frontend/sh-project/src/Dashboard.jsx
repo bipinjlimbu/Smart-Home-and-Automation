@@ -22,8 +22,8 @@ const Dashboard = () => {
         const fetchData = async () => {
             try {
                 const [devRes, sensRes] = await Promise.all([
-                    axios.get(`${API_BASE}/devices/`),
-                    axios.get(`${API_BASE}/sensors/`)
+                    axios.get(`${API_BASE}/device/`),
+                    axios.get(`${API_BASE}/sensor/`)
                 ]);
                 setDevices(devRes.data);
                 setSensors(sensRes.data);
@@ -37,7 +37,7 @@ const Dashboard = () => {
 
     const handleToggle = async (field, value) => {
         try {
-            const res = await axios.patch(`${API_BASE}/devices/`, { [field]: value });
+            const res = await axios.patch(`${API_BASE}/device/`, { [field]: value });
             setDevices(prev => ({ ...prev, ...res.data.data }));
         } catch (err) {
             console.error("Update failed.");
