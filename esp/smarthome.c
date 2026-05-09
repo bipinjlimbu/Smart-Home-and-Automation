@@ -74,8 +74,17 @@ void updateSensors()
 {
     float temp = dht.readTemperature();
     float hum = dht.readHumidity();
+
     int gas = analogRead(MQ2_PIN);
     int soil = analogRead(SOIL_PIN);
+
+    // 🔥 Mapping added (ONLY CHANGE)
+    int gasPercent = map(gas, 0, 4095, 0, 100);
+    gasPercent = constrain(gasPercent, 0, 100);
+
+    int soilPercent = map(soil, 4095, 0, 0, 100);
+    soilPercent = constrain(soilPercent, 0, 100);
+
     bool fire = digitalRead(FLAME_PIN) == LOW; // Assuming active LOW flame sensor
 
     if (!isnan(temp) && !isnan(hum))
@@ -87,13 +96,16 @@ void updateSensors()
         StaticJsonDocument<256> doc;
         doc["temperature"] = temp;
         doc["humidity"] = hum;
-        doc["gas_level"] = gas;
-        doc["moisture_level"] = soil;
+
+        // 🔥 sending mapped values (same keys replaced)
+        doc["gas_level"] = gasPercent;
+        doc["moisture_level"] = soilPercent;
+
         doc["fire_detected"] = fire;
 
         String json;
         serializeJson(doc, json);
-        int httpResponseCode = http.POST(json); // or .PATCH depending on your API
+        int httpResponseCode = http.POST(json);
 
         Serial.print("Sensor Push Code: ");
         Serial.println(httpResponseCode);
