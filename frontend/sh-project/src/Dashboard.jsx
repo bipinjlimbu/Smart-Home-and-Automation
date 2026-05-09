@@ -45,25 +45,26 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="h-screen w-screen bg-[#f1f5f9] overflow-hidden p-6 font-sans text-slate-900 flex flex-col">
+        /* Changed h-screen to min-h-screen and overflow-hidden to overflow-y-auto for mobile scrolling */
+        <div className="min-h-screen w-full bg-[#f1f5f9] overflow-y-auto md:overflow-hidden p-4 md:p-6 font-sans text-slate-900 flex flex-col">
 
             {/* Header */}
-            <div className="flex justify-between items-center mb-4 h-[8%]">
+            <div className="flex justify-between items-center mb-6 md:mb-4 md:h-[8%]">
                 <div>
                     <p className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase">IoT Integrated Systems</p>
-                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">Smart Home Dashboard</h1>
+                    <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Smart Home Dashboard</h1>
                 </div>
-                <div className="flex items-center gap-3 bg-white text-emerald-600 px-5 py-2 rounded-full font-bold text-xs border border-slate-200 shadow-sm">
+                <div className="flex items-center gap-3 bg-white text-emerald-600 px-4 py-2 rounded-full font-bold text-[10px] md:text-xs border border-slate-200 shadow-sm">
                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping" />
-                    <Wifi size={16} /> Live
+                    <Wifi size={14} /> Live
                 </div>
             </div>
 
-            {/* Main Grid */}
-            <div className="grid grid-cols-12 gap-5 flex-1 min-h-0">
+            {/* Main Grid - Responsive columns: 1 on mobile, 12 on desktop */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-5 flex-1 min-h-0">
 
                 {/* Left Column: Fire Warning, Lights & Pump */}
-                <div className="col-span-3 flex flex-col gap-4 min-h-0">
+                <div className="order-1 md:col-span-3 flex flex-col gap-4 min-h-0">
                     <div className={`p-4 rounded-[2rem] border-2 transition-all shrink-0 ${sensors.fire_detected ? 'bg-red-50 border-red-500 animate-pulse' : 'bg-white border-transparent shadow-sm'}`}>
                         <div className="flex justify-between items-center mb-1">
                             <span className={`text-[10px] font-bold uppercase tracking-widest ${sensors.fire_detected ? 'text-red-600' : 'text-emerald-500'}`}>Safety Status</span>
@@ -74,14 +75,14 @@ const Dashboard = () => {
                                 {sensors.fire_detected ? <ShieldAlert size={18} /> : <Zap size={18} />}
                             </div>
                             <span className="font-black text-lg tracking-tighter uppercase">
-                                {sensors.fire_detected ? "Fire Warning" : "Fire Warning"}
+                                Fire Warning
                             </span>
                         </div>
                     </div>
 
-                    <div className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex-1 flex flex-col min-h-0">
+                    <div className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex-1 flex flex-col min-h-[400px] md:min-h-0">
                         <h3 className="font-bold text-slate-400 text-[10px] uppercase tracking-[0.2em] mb-3 text-center">Lighting</h3>
-                        <div className="space-y-3 overflow-hidden flex-1">
+                        <div className="space-y-3 overflow-y-auto md:overflow-hidden flex-1 pr-1">
                             {[1, 2, 3, 4, 5, 6].map((num) => (
                                 <div key={num} className={`flex items-center justify-between p-3.5 rounded-2xl transition-all ${devices[`bulb_${num}`] ? 'bg-amber-50/70 border border-amber-100' : 'bg-slate-50 border border-transparent'}`}>
                                     <div className="flex items-center gap-3">
@@ -114,8 +115,8 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Middle Column */}
-                <div className="col-span-5 bg-slate-900 rounded-[3.5rem] p-8 text-white shadow-2xl flex flex-col border-4 border-slate-800 min-h-0">
+                {/* Middle Column: Telemetry */}
+                <div className="order-3 md:order-2 md:col-span-5 bg-slate-900 rounded-[3.5rem] p-6 md:p-8 text-white shadow-2xl flex flex-col border-4 border-slate-800 min-h-0">
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em]">Telemetry</h3>
                         <Activity className="text-emerald-500" size={18} />
@@ -123,11 +124,11 @@ const Dashboard = () => {
 
                     <h2 className="text-2xl font-bold mb-6 tracking-tight">Environmental Metrics</h2>
 
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-10 flex-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-10 flex-1">
                         <CompactSensor label="Temp" value={sensors.temperature} unit="°C" icon={<Thermometer className="text-rose-400" />} color="bg-rose-400" max={50} />
                         <CompactSensor label="Humidity" value={sensors.humidity} unit="%" icon={<Droplets className="text-sky-400" />} color="bg-sky-400" max={100} />
-                        <CompactSensor label="Soil Moisture" value={sensors.moisture_level} unit="%" icon={<Waves className="text-indigo-400" />} color="bg-indigo-400" max={4095} />
-                        <CompactSensor label="Gas" value={sensors.gas_level} unit="%" icon={<Wind className="text-emerald-400" />} color="bg-emerald-400" max={4095} />
+                        <CompactSensor label="Soil Moisture" value={sensors.moisture_level} unit="%" icon={<Waves className="text-indigo-400" />} color="bg-indigo-400" max={100} />
+                        <CompactSensor label="Gas" value={sensors.gas_level} unit="%" icon={<Wind className="text-emerald-400" />} color="bg-emerald-400" max={100} />
                     </div>
 
                     <div className={`mt-6 p-4 rounded-2xl flex items-center justify-between border-2 transition-all shrink-0 ${sensors.fire_detected ? 'bg-red-500/20 border-red-500 animate-pulse' : 'bg-slate-800 border-slate-700'}`}>
@@ -142,7 +143,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Right Column: Security Gates & Automatic Fan */}
-                <div className="col-span-4 flex flex-col gap-4 min-h-0">
+                <div className="order-2 md:order-3 md:col-span-4 flex flex-col gap-4 min-h-0">
                     <div className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex justify-around items-center shrink-0">
                         <div className="flex gap-3">
                             <button onClick={() => handleToggle('fan', !devices.fan)} className={`p-3 rounded-2xl transition-all ${devices.fan ? 'bg-sky-100 text-sky-600' : 'bg-slate-50 text-slate-400'}`}>
@@ -159,9 +160,9 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex-1 flex flex-col min-h-0">
+                    <div className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex-1 flex flex-col min-h-[400px] md:min-h-0">
                         <h3 className="font-bold text-slate-400 text-[10px] uppercase tracking-widest mb-4 text-center">Security Gates</h3>
-                        <div className="space-y-3 flex-1 overflow-hidden">
+                        <div className="space-y-3 flex-1 overflow-y-auto md:overflow-hidden pr-1">
                             {[1, 2, 3, 4, 5].map((num) => (
                                 <div key={num} className={`flex items-center justify-between p-4 rounded-2xl transition-all ${devices[`door_${num}`] > 0 ? 'bg-emerald-50 border border-emerald-100' : 'bg-slate-50 border border-transparent'}`}>
                                     <div className="flex items-center gap-3">
@@ -183,9 +184,9 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Footer */}
-            <div className="mt-4 h-[10%] flex items-center gap-4 shrink-0">
-                <div className="bg-white px-8 py-3 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-8 flex-1 justify-center">
+            {/* Footer - Scrollable on mobile to fit all names */}
+            <div className="mt-6 md:mt-4 md:h-[10%] flex items-center gap-4 shrink-0 overflow-x-auto pb-2 md:pb-0">
+                <div className="bg-white px-6 md:px-8 py-3 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-6 md:gap-8 flex-1 min-w-max md:justify-center">
                     <span className="text-slate-400 text-[9px] font-black uppercase tracking-[0.4em]">Project Team</span>
                     {["Bipin Limbu", "Yubraj Khatri", "Nirjala Subedi", "Samiksha Bhandari", "Aasish Karki"].map(name => (
                         <div key={name} className="flex items-center gap-2">
