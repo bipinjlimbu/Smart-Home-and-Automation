@@ -126,8 +126,8 @@ const Dashboard = () => {
                     <div className="grid grid-cols-2 gap-x-8 gap-y-10 flex-1">
                         <CompactSensor label="Temp" value={sensors.temperature} unit="°C" icon={<Thermometer className="text-rose-400" />} color="bg-rose-400" max={50} />
                         <CompactSensor label="Humidity" value={sensors.humidity} unit="%" icon={<Droplets className="text-sky-400" />} color="bg-sky-400" max={100} />
-                        <CompactSensor label="Soil Moisture" value={sensors.moisture_level} unit="raw" icon={<Waves className="text-indigo-400" />} color="bg-indigo-400" max={4095} />
-                        <CompactSensor label="Gas" value={sensors.gas_level} unit="raw" icon={<Wind className="text-emerald-400" />} color="bg-emerald-400" max={4095} />
+                        <CompactSensor label="Soil Moisture" value={sensors.moisture_level} unit="%" icon={<Waves className="text-indigo-400" />} color="bg-indigo-400" max={4095} />
+                        <CompactSensor label="Gas" value={sensors.gas_level} unit="%" icon={<Wind className="text-emerald-400" />} color="bg-emerald-400" max={4095} />
                     </div>
 
                     <div className={`mt-6 p-4 rounded-2xl flex items-center justify-between border-2 transition-all shrink-0 ${sensors.fire_detected ? 'bg-red-500/20 border-red-500 animate-pulse' : 'bg-slate-800 border-slate-700'}`}>
