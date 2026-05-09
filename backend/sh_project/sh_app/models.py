@@ -13,7 +13,6 @@ class DeviceControl(models.Model):
     door_3 = models.IntegerField(default=0)
     door_4 = models.IntegerField(default=0)
     door_5 = models.IntegerField(default=0)
-    door_6 = models.IntegerField(default=0)
 
     fan = models.BooleanField(default=False)
     water_pump = models.BooleanField(default=False)
