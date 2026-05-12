@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
     Lightbulb, Lock, Unlock, Thermometer, Droplets,
-    Wind, Flame, ShieldAlert, Wifi, Zap, Waves, Activity
+    Wind, Flame, ShieldAlert, Wifi, Zap, Waves, Activity, Users
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -19,8 +19,8 @@ const Dashboard = () => {
 
     const [history, setHistory] = useState([]);
 
-    const bulbLabels = ["Garage", "Drawing", "Bathroom", "Hall", "Bedroom", "Kitchen"];
-    const gateLabels = ["Garage Gate", "Drawing Gate", "Hall Gate", "Bedroom Gate", "Kitchen Gate"];
+    const bulbLabels = ["Garage Light", "Drawing Light", "Bathroom Light", "Hall Light", "Bedroom Light", "Kitchen Light"];
+    const gateLabels = ["Hall Gate", "Drawing Gate", "Kitchen Gate", "Bedroom Gate", "Garage Gate"];
 
     const API_BASE = 'http://192.168.137.1:8000/api';
 
@@ -36,7 +36,7 @@ const Dashboard = () => {
                 setSensors(sensRes.data);
                 setHistory(histRes.data);
             } catch (err) {
-                console.error("Connection failed.");
+                console.error("Django connection dead.");
             }
         };
         const interval = setInterval(fetchData, 2000);
@@ -48,49 +48,50 @@ const Dashboard = () => {
             const res = await axios.patch(`${API_BASE}/device/`, { [field]: value });
             setDevices(prev => ({ ...prev, ...res.data.data }));
         } catch (err) {
-            console.error("Update failed.");
+            console.error("Toggle failed.");
         }
     };
 
     return (
-        <div className="min-h-screen w-full bg-[#f1f5f9] overflow-y-auto md:overflow-hidden p-4 md:p-6 font-sans text-slate-900 flex flex-col">
+        <div className="min-h-screen w-full bg-[#f1f5f9] p-4 md:p-6 font-sans text-slate-900 flex flex-col gap-5">
 
             {/* Header */}
-            <div className="flex justify-between items-center mb-4 md:h-[8%]">
+            <div className="flex justify-between items-center shrink-0">
                 <div>
                     <p className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase">IoT Integrated Systems</p>
-                    <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Smart Home Dashboard</h1>
+                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">Smart Home Dashboard</h1>
                 </div>
-                <div className="flex items-center gap-3 bg-white text-emerald-600 px-4 py-2 rounded-full font-bold text-[10px] border border-slate-200 shadow-sm">
+                <div className="flex items-center gap-3 bg-white text-emerald-600 px-4 py-2 rounded-full font-bold text-xs border border-slate-200 shadow-sm">
                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping" />
                     <Wifi size={14} /> Live
                 </div>
             </div>
 
+            {/* Main Grid */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-5 flex-1 min-h-0">
 
-                {/* Left Column: Fire Alert, Lighting, and Automatic Water Pump Indicator */}
-                <div className="md:col-span-3 flex flex-col gap-4 min-h-0">
-                    <div className={`p-4 rounded-[2rem] border-2 transition-all ${sensors.fire_detected ? 'bg-red-50 border-red-500 animate-pulse' : 'bg-white border-transparent shadow-sm'}`}>
-                        <div className="flex justify-between items-center mb-1">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Safety</span>
-                            <span className="font-bold text-[10px]">{sensors.fire_detected ? 'ALARM' : 'CLEAR'}</span>
+                {/* Left: Fire Alert, Lights & Water Pump */}
+                <div className="md:col-span-3 flex flex-col gap-4 overflow-hidden">
+                    <div className={`p-4 rounded-[2rem] border-2 transition-all shrink-0 ${sensors.fire_detected ? 'bg-red-50 border-red-500 animate-pulse' : 'bg-white border-transparent shadow-sm'}`}>
+                        <div className="flex justify-between items-center mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                            <span>Safety</span>
+                            <span>{sensors.fire_detected ? 'ALARM' : 'CLEAR'}</span>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className={`p-2 rounded-xl ${sensors.fire_detected ? 'bg-red-500 text-white' : 'bg-emerald-100 text-emerald-600'}`}>
                                 <ShieldAlert size={18} />
                             </div>
-                            <span className="font-black text-lg uppercase">Fire Status</span>
+                            <span className="font-black text-lg uppercase tracking-tighter">Fire Status</span>
                         </div>
                     </div>
 
                     <div className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex-1 flex flex-col overflow-hidden">
-                        <h3 className="font-bold text-slate-400 text-[10px] uppercase tracking-[0.2em] mb-3 text-center">Lighting</h3>
-                        <div className="space-y-2 overflow-y-auto pr-1">
+                        <h3 className="font-bold text-slate-400 text-[10px] uppercase tracking-[0.2em] mb-4 text-center">Lighting</h3>
+                        <div className="space-y-3 overflow-y-auto pr-1 custom-scrollbar">
                             {bulbLabels.map((name, index) => (
-                                <div key={index} className={`flex items-center justify-between p-3 rounded-2xl transition-all ${devices[`bulb_${index + 1}`] ? 'bg-amber-50/70 border border-amber-100' : 'bg-slate-50 border border-transparent'}`}>
+                                <div key={index} className={`flex items-center justify-between p-3.5 rounded-2xl transition-all ${devices[`bulb_${index + 1}`] ? 'bg-amber-50/70 border border-amber-100' : 'bg-slate-50 border border-transparent'}`}>
                                     <div className="flex items-center gap-3">
-                                        <Lightbulb size={16} className={devices[`bulb_${index + 1}`] ? 'text-amber-500 fill-amber-400' : 'text-slate-300'} />
+                                        <Lightbulb size={18} className={devices[`bulb_${index + 1}`] ? 'text-amber-500 fill-amber-400' : 'text-slate-300'} />
                                         <span className="text-[11px] font-bold text-slate-700 uppercase">{name}</span>
                                     </div>
                                     <button onClick={() => handleToggle(`bulb_${index + 1}`, !devices[`bulb_${index + 1}`])} className={`w-9 h-5 rounded-full relative transition-all ${devices[`bulb_${index + 1}`] ? 'bg-amber-400' : 'bg-slate-300'}`}>
@@ -101,69 +102,62 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* Automatic Water Pump Indicator (No Buttons) */}
-                    <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex items-center justify-between">
+                    {/* Water Pump Indicator */}
+                    <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-xl transition-colors ${devices.water_pump ? 'bg-blue-500 text-white animate-pulse' : 'bg-slate-100 text-slate-400'}`}>
-                                <Waves size={18} />
+                            <div className={`p-3 rounded-2xl transition-colors ${devices.water_pump ? 'bg-blue-500 text-white animate-pulse' : 'bg-slate-100 text-slate-400'}`}>
+                                <Waves size={20} />
                             </div>
                             <div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase leading-none">Automatic Pump</p>
-                                <p className={`text-sm font-black uppercase ${devices.water_pump ? 'text-blue-600' : 'text-slate-400'}`}>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase leading-none">Water Pump</p>
+                                <p className={`text-sm font-black uppercase ${devices.water_pump ? 'text-blue-600' : 'text-slate-500'}`}>
                                     {devices.water_pump ? 'Running' : 'Standby'}
                                 </p>
                             </div>
                         </div>
-                        <div className={`w-2 h-2 rounded-full ${devices.water_pump ? 'bg-blue-500' : 'bg-slate-300'}`} />
+                        <div className={`w-2.5 h-2.5 rounded-full ${devices.water_pump ? 'bg-blue-500 shadow-[0_0_10px_#3b82f6]' : 'bg-slate-300'}`} />
                     </div>
                 </div>
 
-                {/* Middle Column: Charts */}
-                <div className="md:col-span-5 bg-slate-900 rounded-[3.5rem] p-6 text-white shadow-2xl flex flex-col border-4 border-slate-800 min-h-0">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em]">Live Telemetry</h3>
+                {/* Center: Charts */}
+                <div className="md:col-span-5 bg-slate-900 rounded-[3rem] p-8 text-white shadow-2xl flex flex-col border-4 border-slate-800">
+                    <div className="flex justify-between items-center mb-8">
+                        <h3 className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em]">Telemetry Data</h3>
                         <Activity className="text-emerald-500" size={18} />
                     </div>
-                    <div className="grid grid-cols-2 gap-4 flex-1 overflow-y-auto pr-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
                         <SensorChartCard label="Temp" value={sensors.temperature} unit="°C" data={history} dataKey="temperature" color="#fb7185" icon={<Thermometer size={14} />} />
                         <SensorChartCard label="Humidity" value={sensors.humidity} unit="%" data={history} dataKey="humidity" color="#38bdf8" icon={<Droplets size={14} />} />
                         <SensorChartCard label="Soil" value={sensors.moisture_level} unit="%" data={history} dataKey="moisture_level" color="#818cf8" icon={<Waves size={14} />} />
                         <SensorChartCard label="Gas" value={sensors.gas_level} unit="%" data={history} dataKey="gas_level" color="#34d399" icon={<Wind size={14} />} />
                     </div>
-                    <div className={`mt-4 p-4 rounded-2xl flex items-center justify-between border-2 ${sensors.fire_detected ? 'bg-red-500/20 border-red-500' : 'bg-slate-800 border-slate-700'}`}>
-                        <div className="flex items-center gap-3">
-                            <Flame className={sensors.fire_detected ? "text-red-500" : "text-slate-600"} size={18} />
-                            <p className="text-[10px] font-bold uppercase text-slate-300 tracking-widest">Flame Sensor</p>
-                        </div>
-                        <span className="text-[9px] font-black uppercase text-slate-500">{sensors.fire_detected ? "Detected" : "Stable"}</span>
-                    </div>
                 </div>
 
-                {/* Right Column: Gas Alert, Gates, and Automatic Fan Indicator */}
-                <div className="md:col-span-4 flex flex-col gap-4 min-h-0">
-                    <div className={`p-4 rounded-[2rem] border-2 ${sensors.gas_level > 50 ? 'bg-orange-50 border-orange-500' : 'bg-white border-transparent shadow-sm'}`}>
-                        <div className="flex justify-between items-center mb-1">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Air Quality</span>
-                            <span className="font-bold text-[10px] text-emerald-500">{sensors.gas_level > 50 ? 'DANGER' : 'SAFE'}</span>
+                {/* Right: Gas Alert, Gates & Fan */}
+                <div className="md:col-span-4 flex flex-col gap-4 overflow-hidden">
+                    <div className={`p-4 rounded-[2rem] border-2 transition-all shrink-0 ${sensors.gas_level > 50 ? 'bg-orange-50 border-orange-500 animate-pulse' : 'bg-white border-transparent shadow-sm'}`}>
+                        <div className="flex justify-between items-center mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                            <span>Air Quality</span>
+                            <span>{sensors.gas_level > 50 ? 'DANGER' : 'STABLE'}</span>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className={`p-2 rounded-xl ${sensors.gas_level > 50 ? 'bg-orange-500 text-white' : 'bg-emerald-100 text-emerald-600'}`}>
                                 <Wind size={18} />
                             </div>
-                            <span className="font-black text-lg uppercase">Gas Leakage</span>
+                            <span className="font-black text-lg uppercase tracking-tighter">Gas Leakage</span>
                         </div>
                     </div>
 
                     <div className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex-1 flex flex-col overflow-hidden">
                         <h3 className="font-bold text-slate-400 text-[10px] uppercase tracking-widest mb-4 text-center">Security Gates</h3>
-                        <div className="space-y-2 overflow-y-auto pr-1">
+                        <div className="space-y-3 overflow-y-auto pr-1 custom-scrollbar">
                             {gateLabels.map((name, index) => (
-                                <div key={index} className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-transparent">
+                                <div key={index} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-transparent">
                                     <div className="flex items-center gap-3">
-                                        {devices[`door_${index + 1}`] > 0 ? <Unlock size={16} className="text-emerald-500" /> : <Lock size={16} className="text-slate-300" />}
-                                        <span className="text-[11px] font-bold text-slate-800 uppercase">{name}</span>
+                                        {devices[`door_${index + 1}`] > 0 ? <Unlock size={18} className="text-emerald-500" /> : <Lock size={18} className="text-slate-300" />}
+                                        <span className="text-[12px] font-bold text-slate-800 uppercase">{name}</span>
                                     </div>
-                                    <button onClick={() => handleToggle(`door_${index + 1}`, devices[`door_${index + 1}`] === 0 ? 90 : 0)} className={`px-4 py-1.5 rounded-xl text-[9px] font-black ${devices[`door_${index + 1}`] > 0 ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'}`}>
+                                    <button onClick={() => handleToggle(`door_${index + 1}`, devices[`door_${index + 1}`] === 0 ? 90 : 0)} className={`px-5 py-2 rounded-xl text-[10px] font-black transition-all ${devices[`door_${index + 1}`] > 0 ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'}`}>
                                         {devices[`door_${index + 1}`] > 0 ? 'OPEN' : 'CLOSE'}
                                     </button>
                                 </div>
@@ -171,16 +165,16 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* Automatic Fan Indicator (No Buttons) */}
-                    <div className="bg-white p-4 rounded-[2.5rem] shadow-sm border border-slate-100 flex justify-between items-center">
+                    {/* Automatic Fan Indicator */}
+                    <div className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex justify-between items-center shrink-0">
                         <div className="flex items-center gap-4">
-                            <div className={`p-3 rounded-2xl transition-colors ${devices.fan ? 'bg-sky-500 text-white shadow-lg' : 'bg-slate-50 text-slate-400'}`}>
+                            <div className={`p-4 rounded-2xl transition-colors ${devices.fan ? 'bg-sky-500 text-white shadow-lg shadow-sky-200' : 'bg-slate-50 text-slate-300'}`}>
                                 <Wind size={24} className={devices.fan ? 'animate-spin' : ''} />
                             </div>
                             <div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase leading-none mb-1">Climate Automation</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase leading-none mb-1">Fan Automation</p>
                                 <p className={`text-xl font-black uppercase ${devices.fan ? 'text-sky-600' : 'text-slate-800'}`}>
-                                    {devices.fan ? 'Fan Active' : 'Fan Off'}
+                                    {devices.fan ? 'Active' : 'Off'}
                                 </p>
                             </div>
                         </div>
@@ -188,34 +182,66 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Team Footer */}
-            <div className="mt-4 bg-white px-6 py-3 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-center gap-6 overflow-x-auto">
-                {["Bipin Limbu", "Yubraj Khatri", "Nirjala Subedi", "Samiksha Bhandari", "Aasish Karki"].map(name => (
-                    <div key={name} className="flex items-center gap-2 whitespace-nowrap">
-                        <div className="w-6 h-6 rounded bg-slate-900 flex items-center justify-center text-[8px] font-bold text-white">{name[0]}</div>
-                        <span className="text-[10px] font-bold text-slate-600">{name}</span>
-                    </div>
-                ))}
+            {/* Project Team Footer - FULLY RESPONSIVE & CENTERED */}
+            <div className="bg-white px-6 py-5 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
+                    <Users size={18} className="text-slate-300" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">Project Team:</span>
+                </div>
+
+                {/* Grid setup for mobile, Flex for desktop */}
+                <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:gap-10">
+                    {["Bipin Limbu", "Yubraj Khatri", "Nirjala Subedi", "Samiksha Bhandari", "Aasish Karki"].map(name => (
+                        <div key={name} className="flex items-center gap-3 whitespace-nowrap">
+                            <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-[11px] font-bold text-white shadow-sm shrink-0">
+                                {name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                            </div>
+                            <span className="text-[12px] font-bold text-slate-700">{name}</span>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );
 };
 
 const SensorChartCard = ({ label, value, unit, data, dataKey, color, icon }) => (
-    <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-3 flex flex-col h-[150px]">
+    <div className="bg-slate-800/40 border border-slate-700/50 rounded-3xl p-4 flex flex-col h-[180px] transition-all hover:bg-slate-800/60">
         <div className="flex justify-between items-start mb-2">
             <div className="flex items-center gap-2">
-                <span className="text-slate-500">{icon}</span>
-                <span className="text-slate-500 text-[9px] font-bold uppercase">{label}</span>
+                <div className="p-1.5 bg-slate-900 rounded-lg text-slate-400">{icon}</div>
+                <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">{label}</span>
             </div>
             <div className="text-right">
-                <span className="text-xl font-black block leading-none">{value}{unit}</span>
+                <span className="text-2xl font-black tracking-tighter leading-none block">{value}</span>
+                <span className="text-slate-500 font-bold text-[9px] uppercase">{unit}</span>
             </div>
         </div>
         <div className="flex-1 mt-auto">
             <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data}>
-                    <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} dot={false} isAnimationActive={false} />
+                    {/* Yo Tooltip thapepachi hover garda data auncha */}
+                    <Tooltip
+                        contentStyle={{
+                            backgroundColor: '#0f172a',
+                            border: 'none',
+                            borderRadius: '12px',
+                            fontSize: '10px',
+                            fontWeight: 'bold'
+                        }}
+                        itemStyle={{ color: color }}
+                        labelStyle={{ display: 'none' }}
+                        cursor={{ stroke: '#334155', strokeWidth: 1 }}
+                    />
+                    <Line
+                        type="monotone"
+                        dataKey={dataKey}
+                        stroke={color}
+                        strokeWidth={3}
+                        dot={false}
+                        activeDot={{ r: 4, strokeWidth: 0 }} // Hover garda dot dekhine
+                        isAnimationActive={false}
+                    />
                 </LineChart>
             </ResponsiveContainer>
         </div>
