@@ -29,3 +29,11 @@ def sensor_api(request):
     latest = SensorData.objects.last()
     serializer = SensorDataSerializer(latest)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def sensor_history_api(request):
+    # Fetch the last 15 entries to keep the chart clean
+    history = SensorData.objects.order_by('-id')[:15]
+    # Reverse so the oldest data is on the left
+    serializer = SensorDataSerializer(reversed(history), many=True)
+    return Response(serializer.data)
