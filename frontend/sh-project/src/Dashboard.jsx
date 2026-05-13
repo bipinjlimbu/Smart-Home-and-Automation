@@ -19,7 +19,7 @@ const Dashboard = () => {
 
     const [history, setHistory] = useState([]);
 
-    const bulbLabels = ["Garage Light", "Drawing Light", "Bathroom Light", "Hall Light", "Bedroom Light", "Kitchen Light"];
+    const bulbLabels = ["Garage Light", "Drawing Light", "Hall Light", "Bathroom Light", "Bedroom Light", "Kitchen Light"];
     const gateLabels = ["Hall Gate", "Drawing Gate", "Kitchen Gate", "Bedroom Gate", "Garage Gate"];
 
     const API_BASE = 'http://192.168.137.1:8000/api';
@@ -101,22 +101,6 @@ const Dashboard = () => {
                             ))}
                         </div>
                     </div>
-
-                    {/* Water Pump Indicator */}
-                    <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex items-center justify-between shrink-0">
-                        <div className="flex items-center gap-3">
-                            <div className={`p-3 rounded-2xl transition-colors ${devices.water_pump ? 'bg-blue-500 text-white animate-pulse' : 'bg-slate-100 text-slate-400'}`}>
-                                <Waves size={20} />
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase leading-none">Water Pump</p>
-                                <p className={`text-sm font-black uppercase ${devices.water_pump ? 'text-blue-600' : 'text-slate-500'}`}>
-                                    {devices.water_pump ? 'Running' : 'Standby'}
-                                </p>
-                            </div>
-                        </div>
-                        <div className={`w-2.5 h-2.5 rounded-full ${devices.water_pump ? 'bg-blue-500 shadow-[0_0_10px_#3b82f6]' : 'bg-slate-300'}`} />
-                    </div>
                 </div>
 
                 {/* Center: Charts */}
@@ -162,21 +146,6 @@ const Dashboard = () => {
                                     </button>
                                 </div>
                             ))}
-                        </div>
-                    </div>
-
-                    {/* Automatic Fan Indicator */}
-                    <div className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex justify-between items-center shrink-0">
-                        <div className="flex items-center gap-4">
-                            <div className={`p-4 rounded-2xl transition-colors ${devices.fan ? 'bg-sky-500 text-white shadow-lg shadow-sky-200' : 'bg-slate-50 text-slate-300'}`}>
-                                <Wind size={24} className={devices.fan ? 'animate-spin' : ''} />
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase leading-none mb-1">Fan Automation</p>
-                                <p className={`text-xl font-black uppercase ${devices.fan ? 'text-sky-600' : 'text-slate-800'}`}>
-                                    {devices.fan ? 'Active' : 'Off'}
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>
